@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Place Order – Moovs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            mikky: '#00C47C',
+            darkbg: '#1e1e2f',
+            lightgray: '#f6f8fc'
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+<body class="bg-lightgray dark:bg-darkbg text-gray-800 dark:text-white min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <div class="p-4 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between">
+    <h1 class="text-xl font-bold">📝 Place New Order</h1>
+    <a href="home.html" class="text-mikky font-semibold hover:underline">← Back</a>
+  </div>
+
+  <!-- Main Form -->
+  <div class="flex-grow max-w-xl mx-auto mt-8 px-4">
+    <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-md">
+      <form id="orderForm" class="space-y-5">
+        <div>
+          <label class="block mb-2 text-sm font-medium">Select Service</label>
+          <select id="service" required class="w-full p-3 rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white">
+            <option value="">-- Choose a service --</option>
+            <option value="Website Development">Website Development</option>
+            <option value="Branding & Design">Branding & Design</option>
+            <option value="Digital Marketing">Digital Marketing</option>
+            <option value="Mobile App Development">Mobile App Development</option>
+            <option value="SEO Optimization">SEO Optimization</option>
+          </select>
+        </div>
+        <div>
+          <label class="block mb-2 text-sm font-medium">Describe Your Need</label>
+          <textarea id="description" rows="5" required placeholder="Describe the service you need..." class="w-full p-3 rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white"></textarea>
+        </div>
+        <button type="submit" class="bg-mikky text-white w-full py-3 rounded-lg font-bold hover:bg-emerald-600 transition">Submit Order</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 fixed bottom-0 w-full z-50">
+    <div class="flex justify-around py-3 text-gray-600 dark:text-gray-300">
+      <a href="../home/index.html" class="flex flex-col items-center text-sm hover:text-mikky">
+        <i class="bx bx-home text-2xl"></i>
+        <span>Home</span>
+      </a>
+      <a href="../order/index.html" class="flex flex-col items-center text-sm text-mikky font-semibold">
+        <i class="bx bx-cart text-2xl"></i>
+        <span>Order</span>
+      </a>
+      <a href="chat.html" class="flex flex-col items-center text-sm hover:text-mikky">
+        <i class="bx bx-message text-2xl"></i>
+        <span>Chat</span>
+      </a>
+      <a href="../settings/index.html" class="flex flex-col items-center text-sm hover:text-mikky">
+        <i class="bx bx-cog text-2xl"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Firebase & WhatsApp Script -->
+  <script type="module">
+    // Firebase imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyCU2xz-keuLS6SSMNraYe7bC59iQu-Y4b4",
+  authDomain: "assignment-3-d46ca.firebaseapp.com",
+  projectId: "assignment-3-d46ca",
+  storageBucket: "assignment-3-d46ca.firebasestorage.app",
+  messagingSenderId: "840587574527",
+  appId: "1:840587574527:web:ecdaa3a39b7645dc42e0ca"
+};
+
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    const orderForm = document.getElementById("orderForm");
+
+    let currentUser = null;
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+      } else {
+        alert("Please login to place an order.");
+        window.location.href = "login.html";
+      }
+    });
+
+    orderForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const service = document.getElementById("service").value;
+      const description = document.getElementById("description").value;
+
+      if (!service || !description) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      try {
+        const orderRef = doc(collection(db, "orders"));
+        await setDoc(orderRef, {
+          userId: currentUser.uid,
+          email: currentUser.email,
+          service,
+          description,
+          status: "Pending",
+          createdAt: serverTimestamp()
+        });
+
+        const message = `🚀 *New Order from Moovs User*\n\n🛠️ Service: ${service}\n📝 Description: ${description}\n\n👤 User: ${currentUser.email}`;
+        const phone = "2348123456789";
+        const whatsappLink = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+        window.location.href = whatsappLink;
+
+      } catch (error) {
+        console.error("Order Error:", error);
+        alert("Failed to submit order. Please try again.");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings – Moovs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            mikky: '#00C47C',
+            darkbg: '#1e1e2f',
+            lightgray: '#f6f8fc'
+          }
+        }
+      }
+    };
+  </script>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+<body class="bg-lightgray dark:bg-darkbg text-gray-800 dark:text-white min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <div class="p-4 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between">
+    <h1 class="text-xl font-bold">⚙️ Settings</h1>
+    <a href="home.html" class="text-mikky font-semibold hover:underline">← Back</a>
+  </div>
+
+  <!-- Settings Content -->
+  <div class="flex-grow px-4 py-6 max-w-xl mx-auto">
+    <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-md space-y-6">
+
+      <!-- User Info -->
+      <div>
+        <h2 class="text-lg font-semibold mb-2">👤 Your Info</h2>
+        <div id="userInfo" class="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+          <p><span class="font-medium">Full Name:</span> <span id="userName">Loading...</span></p>
+          <p><span class="font-medium">Email:</span> <span id="userEmail">Loading...</span></p>
+        </div>
+        <a href="profile.html" class="inline-block mt-3 px-4 py-2 bg-mikky text-white rounded-lg hover:bg-emerald-600 text-sm">Edit Profile</a>
+      </div>
+
+      <!-- Theme Toggle -->
+      <div class="flex justify-between items-center">
+        <span class="text-sm font-medium">🌙 Dark Mode</span>
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="themeToggle" class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-300 peer-focus:ring-4 peer-focus:ring-mikky rounded-full peer dark:bg-gray-600 peer-checked:bg-mikky relative transition-all">
+            <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-md peer-checked:translate-x-full transition-transform"></span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Language -->
+      <div>
+        <label class="block text-sm font-medium mb-2">🌍 Language</label>
+        <select id="language" class="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white">
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="yo">Yorùbá</option>
+          <option value="es">Español</option>
+        </select>
+      </div>
+
+      <!-- Logout -->
+      <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-lg">
+        🚪 Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 fixed bottom-0 w-full z-50">
+    <div class="flex justify-around py-3 text-gray-600 dark:text-gray-300">
+      <a href="../home/index.html" class="flex flex-col items-center text-sm hover:text-mikky">
+        <i class="bx bx-home text-2xl"></i>
+        <span>Home</span>
+      </a>
+      <a href="../order/index.html" class="flex flex-col items-center text-sm hover:text-mikky">
+        <i class="bx bx-cart text-2xl"></i>
+        <span>Order</span>
+      </a>
+      <a href="chat.html" class="flex flex-col items-center text-sm hover:text-mikky">
+        <i class="bx bx-message text-2xl"></i>
+        <span>Chat</span>
+      </a>
+      <a href="../settings/index.html" class="flex flex-col items-center text-sm text-mikky font-semibold">
+        <i class="bx bx-cog text-2xl"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Script: Firebase + Theme + Logout -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyCU2xz-keuLS6SSMNraYe7bC59iQu-Y4b4",
+  authDomain: "assignment-3-d46ca.firebaseapp.com",
+  projectId: "assignment-3-d46ca",
+  storageBucket: "assignment-3-d46ca.firebasestorage.app",
+  messagingSenderId: "840587574527",
+  appId: "1:840587574527:web:ecdaa3a39b7645dc42e0ca"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const userName = document.getElementById("userName");
+    const userEmail = document.getElementById("userEmail");
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        userName.textContent = user.displayName || "No Name";
+        userEmail.textContent = user.email;
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.checked = localStorage.getItem('theme') === 'dark';
+
+    themeToggle.addEventListener('change', () => {
+      if (themeToggle.checked) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    });
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        localStorage.removeItem('theme');
+        window.location.href = "login.html";
+      });
+    });
+
+    // Restore saved theme on load
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+</body>
+</html>

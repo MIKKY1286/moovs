@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Moovs - Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            mikky: '#00C47C',
+            lightgray: '#f6f8fc',
+          }
+        }
+      }
+    }
+  </script>
+  <script type="module">
+    // Firebase Setup
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyCU2xz-keuLS6SSMNraYe7bC59iQu-Y4b4",
+  authDomain: "assignment-3-d46ca.firebaseapp.com",
+  projectId: "assignment-3-d46ca",
+  storageBucket: "assignment-3-d46ca.firebasestorage.app",
+  messagingSenderId: "840587574527",
+  appId: "1:840587574527:web:ecdaa3a39b7645dc42e0ca"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const signupBtn = document.getElementById("signupBtn");
+
+      signupBtn.addEventListener("click", async () => {
+        const email = document.getElementById("email").value;
+        const agree = document.getElementById("agree").checked;
+
+        if (!email || !agree) {
+          alert("Please enter email and agree to terms.");
+          return;
+        }
+
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Save OTP to Firestore (for demo - production should expire it)
+        await setDoc(doc(db, "otp-verifications", email), {
+          otp,
+          createdAt: new Date()
+        });
+
+        // Optional: Trigger your own cloud function or send OTP via SMTP/email API
+        alert(`OTP sent to ${email}:\n\n${otp}`);
+
+        // Redirect to OTP entry page
+        localStorage.setItem("pendingEmail", email);
+        window.location.href = "./verify-otp.html";
+      });
+    });
+  </script>
+</head>
+<body class="bg-lightgray flex items-center justify-center min-h-screen px-4">
+  <div class="w-full max-w-sm bg-white rounded-2xl shadow-md p-6 text-center">
+    <h1 class="text-4xl font-bold text-mikky mb-6">moovs</h1>
+    <h2 class="text-xl font-semibold text-gray-800 mb-1">Sign Up</h2>
+    <p class="text-sm text-gray-600 mb-6">Enter your Email ID to receive a verification code.</p>
+
+    <!-- Email Input -->
+    <div class="mb-5 relative">
+      <input type="email" id="email" placeholder="Email ID" class="w-full pl-3 pr-3 py-3 border border-mikky rounded-lg focus:outline-none focus:ring-2 focus:ring-mikky" />
+    </div>
+
+    <!-- Terms -->
+    <div class="flex items-start text-sm text-gray-600 mb-6 gap-2 text-left">
+      <input type="checkbox" id="agree" class="mt-1 accent-mikky" />
+      <p>
+        By continuing, I agree to the
+        <a href="#" class="text-mikky font-medium hover:underline">Terms of Use</a> and
+        <a href="#" class="text-mikky font-medium hover:underline">Privacy Policy</a>.
+      </p>
+    </div>
+
+    <!-- Sign Up -->
+    <button id="signupBtn" class="w-full bg-mikky text-white py-3 rounded-lg font-semibold hover:bg-emerald-600 transition">Send OTP</button>
+
+    <!-- Already a member -->
+    <p class="text-sm text-gray-600 mt-6">
+      Already have an account?
+      <a href="login.html" class="text-mikky font-semibold hover:underline">Sign In</a>
+    </p>
+  </div>
+</body>
+</html>

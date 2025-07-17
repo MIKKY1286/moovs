@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify OTP - Moovs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            mikky: '#00C47C',
+            lightgray: '#f6f8fc',
+          }
+        }
+      }
+    }
+  </script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyCU2xz-keuLS6SSMNraYe7bC59iQu-Y4b4",
+  authDomain: "assignment-3-d46ca.firebaseapp.com",
+  projectId: "assignment-3-d46ca",
+  storageBucket: "assignment-3-d46ca.firebasestorage.app",
+  messagingSenderId: "840587574527",
+  appId: "1:840587574527:web:ecdaa3a39b7645dc42e0ca"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const verifyBtn = document.getElementById("verifyBtn");
+      const email = localStorage.getItem("pendingEmail");
+
+      if (!email) {
+        alert("No email found. Please start again.");
+        window.location.href = "signup.html";
+        return;
+      }
+
+      verifyBtn.addEventListener("click", async () => {
+        const enteredOtp = document.getElementById("otp").value;
+
+        if (!enteredOtp) {
+          alert("Please enter the OTP.");
+          return;
+        }
+
+        const docRef = doc(db, "otp-verifications", email);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.otp === enteredOtp) {
+            // Proceed to password creation
+            localStorage.setItem("verifiedEmail", email);
+            window.location.href = "./set-password.html";
+          } else {
+            alert("Invalid OTP. Please try again.");
+          }
+        } else {
+          alert("OTP expired or not found.");
+        }
+      });
+    });
+  </script>
+</head>
+<body class="bg-lightgray flex items-center justify-center min-h-screen px-4">
+  <div class="w-full max-w-sm bg-white rounded-2xl shadow-md p-6 text-center">
+    <h1 class="text-4xl font-bold text-mikky mb-6">moovs</h1>
+    <h2 class="text-xl font-semibold text-gray-800 mb-2">Verify Code</h2>
+    <p class="text-sm text-gray-600 mb-6">Enter the 6-digit code sent to your email.</p>
+
+    <!-- OTP Input -->
+    <input id="otp" type="text" maxlength="6" placeholder="Enter OTP" class="w-full mb-6 px-4 py-3 border border-mikky rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-mikky tracking-widest text-lg" />
+
+    <!-- Verify Button -->
+    <button id="verifyBtn" class="w-full bg-mikky text-white py-3 rounded-lg font-semibold hover:bg-emerald-600 transition">Verify</button>
+
+    <p class="text-sm text-gray-500 mt-6">Didn’t get the code? <a href="signup.html" class="text-mikky font-semibold hover:underline">Resend</a></p>
+  </div>
+</body>
+</html>

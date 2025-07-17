@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Moovs Splash</title>
+
+  <!-- Firebase Auth Redirect with Fade Out -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyCU2xz-keuLS6SSMNraYe7bC59iQu-Y4b4",
+  authDomain: "assignment-3-d46ca.firebaseapp.com",
+  projectId: "assignment-3-d46ca",
+  storageBucket: "assignment-3-d46ca.firebasestorage.app",
+  messagingSenderId: "840587574527",
+  appId: "1:840587574527:web:ecdaa3a39b7645dc42e0ca"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.body.classList.add('fade-out');
+
+        // Wait for fade animation (600ms) then redirect
+        setTimeout(() => {
+          onAuthStateChanged(auth, (user) => {
+            if (user) {
+              window.location.href = "./home/index.html";
+            } else {
+              window.location.href = "./signUp/index.html";
+            }
+          });
+        }, 600);
+      }, 2000); // Initial splash display time
+    });
+  </script>
+
+  <!-- Styles -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: #f6f8fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Poppins', sans-serif;
+      transition: opacity 0.6s ease;
+    }
+
+    body.fade-out {
+      opacity: 0;
+    }
+
+    .logo-text {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #00C47C;
+      animation: bounce 1s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-15px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-text">moovs</div>
+</body>
+</html>

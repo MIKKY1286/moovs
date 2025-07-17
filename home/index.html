@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Moovs • Dashboard</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            mikky: '#00C47C',
+            lightgray: '#f1f5f9',
+            darkbg: '#111827',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-lightgray dark:bg-darkbg text-gray-800 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+
+  <!-- Top Greeting Bar -->
+  <header class="bg-white dark:bg-gray-900 shadow p-4 flex justify-between items-center sticky top-0 z-40">
+    <h1 class="text-xl font-semibold flex items-center gap-2">
+      <box-icon name="sun" type="solid" class="text-mikky"></box-icon>
+      Good <span id="greeting" class="ml-1"></span>, <span id="username" class="text-mikky font-bold ml-1">User</span>
+    </h1>
+  </header>
+
+  <!-- Dashboard Content -->
+  <main class="p-5 pb-24 max-w-6xl mx-auto space-y-8">
+
+    <!-- Profile Summary -->
+    <section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Full Name</p>
+        <h3 id="userFullName" class="text-lg font-semibold">...</h3>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
+        <h3 id="userEmail" class="text-lg font-semibold">...</h3>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+        <h3 id="userPhone" class="text-lg font-semibold">...</h3>
+      </div>
+    </section>
+
+    <!-- Quick Order -->
+    <section class="bg-mikky text-white rounded-xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-md">
+      <div>
+        <h2 class="text-2xl font-bold">Need a Service?</h2>
+        <p class="text-white/90">Place a new order for Mikky Technology service</p>
+      </div>
+      <a href="order.html" class="bg-white text-mikky px-5 py-2 rounded-lg font-semibold hover:bg-gray-100 transition">Order Now</a>
+    </section>
+
+    <!-- Services -->
+    <section>
+      <h2 class="text-xl font-bold mb-3">Explore Services</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:shadow-lg transition cursor-pointer">
+          <h3 class="text-lg font-semibold">Website Development</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Custom sites, eCommerce, portals</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:shadow-lg transition cursor-pointer">
+          <h3 class="text-lg font-semibold">Branding & Design</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Logo, flyers, UI/UX, animations</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:shadow-lg transition cursor-pointer">
+          <h3 class="text-lg font-semibold">Digital Marketing</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">SEO, social media, campaigns</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders -->
+    <section>
+      <h2 class="text-xl font-bold mb-3">Your Orders</h2>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 space-y-3">
+        <div class="flex justify-between items-center border-b pb-2 border-gray-300 dark:border-gray-700">
+          <span class="text-sm">Website Redesign</span>
+          <span class="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 text-xs px-3 py-1 rounded-full">In Progress</span>
+        </div>
+        <div class="flex justify-between items-center border-b pb-2 border-gray-300 dark:border-gray-700">
+          <span class="text-sm">Logo Design</span>
+          <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs px-3 py-1 rounded-full">Completed</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm">Marketing Plan</span>
+          <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs px-3 py-1 rounded-full">Pending</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Floating Support -->
+  <div class="fixed bottom-20 right-5 flex flex-col gap-3 z-40">
+    <a href="https://wa.me/2348123456789" class="bg-green-500 p-3 rounded-full shadow-lg hover:bg-green-600">
+      <box-icon name="whatsapp" type="logo" color="white"></box-icon>
+    </a>
+    <a href="tel:+2348123456789" class="bg-blue-500 p-3 rounded-full shadow-lg hover:bg-blue-600">
+      <box-icon name="phone-call" color="white"></box-icon>
+    </a>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 fixed bottom-0 w-full z-50">
+    <div class="flex justify-around py-3 text-gray-600 dark:text-gray-300">
+      <a href="../home/index.html" class="flex flex-col items-center text-sm text-mikky font-semibold">
+        <i class="bx bx-home text-2xl"></i>
+        <span>Home</span>
+      </a>
+      <a href="../order/index.html" class="flex flex-col items-center text-sm hover:text-mikky">
+        <i class="bx bx-cart text-2xl"></i>
+        <span>Order</span>
+      </a>
+      <a href="chat.html" class="flex flex-col items-center text-sm hover:text-mikky">
+        <i class="bx bx-message text-2xl"></i>
+        <span>Chat</span>
+      </a>
+      <a href="../settings/index.html" class="flex flex-col items-center text-sm hover:text-mikky">
+        <i class="bx bx-cog text-2xl"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Firebase Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCU2xz-keuLS6SSMNraYe7bC59iQu-Y4b4",
+      authDomain: "assignment-3-d46ca.firebaseapp.com",
+      projectId: "assignment-3-d46ca",
+      storageBucket: "assignment-3-d46ca.appspot.com",
+      messagingSenderId: "840587574527",
+      appId: "1:840587574527:web:ecdaa3a39b7645dc42e0ca"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const greeting = document.getElementById("greeting");
+    const hour = new Date().getHours();
+    greeting.textContent = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return (window.location.href = "auth.html");
+      const userRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById("fullName").textContent = data.fullName || "User";
+        document.getElementById("fullName").textContent = data.fullName || "...";
+        document.getElementById("userEmail").textContent = data.email || "...";
+        document.getElementById("userPhone").textContent = data.phone || "...";
+      }
+    });
+  </script>
+
+</body>
+</html>

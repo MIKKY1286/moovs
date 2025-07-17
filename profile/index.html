@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Moovs - Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            mikky: '#00C47C',
+            lightgray: '#f6f8fc',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-lightgray min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <h2 class="text-3xl font-bold text-mikky mb-2 text-center">Welcome to Moovs!</h2>
+    <p class="text-gray-600 text-sm text-center mb-6">Complete your profile to continue.</p>
+
+    <form id="profileForm" class="space-y-5">
+      <!-- Full Name -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Full Name</label>
+        <input type="text" id="fullName" required placeholder="e.g. Michael Ayodeji" class="w-full mt-1 p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-mikky outline-none" />
+      </div>
+
+      <!-- Mobile -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Mobile Number</label>
+        <input type="tel" id="mobile" required placeholder="+234 801 234 5678" class="w-full mt-1 p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-mikky outline-none" />
+      </div>
+
+      <!-- Date of Birth -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Date of Birth</label>
+        <input type="date" id="dob" required class="w-full mt-1 p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-mikky outline-none" />
+      </div>
+
+      <!-- Gender -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Gender</label>
+        <select id="gender" required class="w-full mt-1 p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-mikky outline-none">
+          <option value="">Select Gender</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <!-- Country Dropdown -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Country</label>
+        <select id="country" required class="w-full mt-1 p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-mikky outline-none">
+          <option value="">Select Country</option>
+        </select>
+      </div>
+
+      <!-- Save Button -->
+      <button type="submit" class="w-full bg-mikky text-white py-3 rounded-md font-semibold hover:bg-emerald-600 transition">Save & Continue</button>
+    </form>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCU2xz-keuLS6SSMNraYe7bC59iQu-Y4b4",
+      authDomain: "assignment-3-d46ca.firebaseapp.com",
+      projectId: "assignment-3-d46ca",
+      storageBucket: "assignment-3-d46ca.appspot.com",
+      messagingSenderId: "840587574527",
+      appId: "1:840587574527:web:ecdaa3a39b7645dc42e0ca"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const form = document.getElementById("profileForm");
+
+    // Country list
+    const countries = [
+      "Nigeria", "Ghana", "South Africa", "Kenya", "Egypt", "Algeria", "United States", "Canada", "United Kingdom", "France", "Germany", "India", "Brazil", "Australia", "Mexico", "China", "Japan", "Russia", "Spain", "Italy", "Netherlands", "Norway", "Sweden", "Finland", "Switzerland", "UAE", "Saudi Arabia", "Turkey", "Pakistan", "Bangladesh", "Ukraine", "Poland", "Portugal", "Argentina", "Chile", "Colombia", "Singapore", "Malaysia", "Indonesia", "Vietnam", "Thailand"
+    ].sort();
+
+    const countrySelect = document.getElementById("country");
+    countries.forEach(country => {
+      const option = document.createElement("option");
+      option.value = country;
+      option.textContent = country;
+      countrySelect.appendChild(option);
+    });
+
+    // Auth and submission
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        alert("You are not logged in!");
+        window.location.href = "login.html";
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Validation
+        const fullName = document.getElementById("fullName").value.trim();
+        const mobile = document.getElementById("mobile").value.trim();
+        const dob = document.getElementById("dob").value;
+        const gender = document.getElementById("gender").value;
+        const country = document.getElementById("country").value;
+
+        if (!fullName || !mobile || !dob || !gender || !country) {
+          alert("All fields are required!");
+          return;
+        }
+
+        const data = { fullName, mobile, dob, gender, country };
+
+        try {
+          await setDoc(doc(db, "users", user.uid), data, { merge: true });
+          alert("Profile saved successfully!");
+          window.location.href = "home.html";
+        } catch (error) {
+          console.error(error);
+          alert("Something went wrong. Please try again.");
+        }
+        // After profile is successfully saved
+        window.location.href = './registration-success.html';
+      });
+    });
+  </script>
+</body>
+</html>
